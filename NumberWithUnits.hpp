@@ -18,12 +18,8 @@ namespace ariel {
         std::string unit;
         double n;
         static Unit g;
-//        static std::map<std::string, std::string[2]> convert_big;
-//        static std::map<std::string, std::string[2]> convert_small;
-//        static std::map<std::string, std::vector<std::string>> same;
-//    static std::vector<std::vector<std::string>> same;
 
-        static double find_diff(const NumberWithUnits& unit1, const NumberWithUnits& unit2) ;
+        const float TOLERANCE = 0.001;
 
     public:
 
@@ -76,7 +72,7 @@ namespace ariel {
 
         friend std::ostream &operator<<(std::ostream &os, const NumberWithUnits &num);
 
-        friend std::istream &operator>>(std::istream &is, const NumberWithUnits &num);
+        friend std::istream &operator>>(std::istream &is, NumberWithUnits &num);
 
     };
 }

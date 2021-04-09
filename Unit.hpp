@@ -12,9 +12,13 @@ namespace ariel {
     class Unit {
     private:
         std::map<std::string, std::map<std::string, double>> graph;
+        std::unordered_set<std::string> nodes;
+
     public:
         void insert_edge(std::string &unit1, std::string &unit2, double conv) {
             graph[unit1][unit2] = conv;
+            nodes.insert(unit1);
+            nodes.insert(unit2);
         }
 
         double get_conv(const std::string &unit1, const std::string &unit2) {
@@ -43,42 +47,11 @@ namespace ariel {
             return ans;
         }
 
-
-
-
-
-
-
-
-
-
-//            std::stack <std::map<std::string, double>> stack;
-//            std::unordered_set <std::string> visited;
-//            std::string key = unit1;
-//            stack.push(graph[key]);
-//            visited.insert(key);
-//            while (!stack.empty()) {
-//                std::map<std::string, double> temp = stack.top();
-//                stack.pop();
-//                
-//                for (const auto& [k, v] : temp) {
-//                    if (k == unit2) {
-//                        
-//                    }
-//                    if (!visited.contains(k)) {
-//                        stack.push(temp[k]);
-//                    }
-//                    std::cout << key << " has value " << value << std::endl;
-//                }
-//
-//            }
-//        }
-
         bool is_same_dim(const std::string &unit1, const std::string &unit2) {
-            if (graph[unit1].contains(unit2)){
+            if (graph[unit1].contains(unit2)) {
                 return true;
             }
-            std::unordered_set <std::string> visited;
+            std::unordered_set<std::string> visited;
             std::stack<std::string> stack;
             stack.push(unit1);
             visited.insert(unit1);
@@ -88,13 +61,17 @@ namespace ariel {
                 for (const auto&[k, v] : graph[temp]) {
                     if (k == unit2) {
                         return true;
-                    } else if (!visited.contains(k)){
+                    } else if (!visited.contains(k)) {
                         visited.insert(k);
                         stack.push(k);
                     }
                 }
             }
             return false;
+        }
+
+        bool isThereAUnit(const std::string& unit) {
+            return nodes.contains(unit);
         }
     };
 
