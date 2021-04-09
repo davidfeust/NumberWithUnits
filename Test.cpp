@@ -6,4 +6,26 @@
 
 TEST_CASE("1") {
     CHECK(1);
+    CHECK(1);
+    CHECK(1);
+    CHECK(1);
+    CHECK(1);
+    CHECK(1);
+    CHECK(1);
+    CHECK(1);
+    CHECK(1);
+    CHECK(1);
+    CHECK(1);
+    CHECK(1);
+    CHECK(1);
+    CHECK(1);
+    CHECK(1);
+    CHECK(1);
+    CHECK(1);
+    CHECK(1);
+    CHECK(1);
+    CHECK(1);
+    CHECK(1);
+    CHECK(1);
+    CHECK(1);
 }

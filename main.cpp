@@ -1,6 +1,8 @@
 #include <iostream>
-
+#include "Unit.hpp"
+using namespace std;
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    ariel::Unit g;
+
     return 0;
 }
