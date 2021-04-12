@@ -10,98 +10,98 @@
 using namespace ariel;
 using namespace std;
 
-Unit NumberWithUnits::g;
+UnitGraph NumberWithUnits::_units_graph;
 
-ariel::NumberWithUnits::NumberWithUnits(double num, std::string unit) : n(num), unit(std::move(unit)) {
-    if (!g.isThereAUnit(this->unit)) {
-        throw std::runtime_error("Unknown unit");
+ariel::NumberWithUnits::NumberWithUnits(double num, std::string unit) : _n(num), _unit(std::move(unit)) {
+    if (!_units_graph.isThereAUnit(this->_unit)) {
+        throw std::runtime_error("Unknown _unit");
     }
 }
 
 void NumberWithUnits::read_units(std::ifstream &file) {
     string line;
     while (getline(file, line)) {
-        string split[3];
-        int j = 0;
+        array<string, 3> split;
+        size_t j = 0;
         while (j < 3) {
             string s = line.substr(0, line.find_first_of(' ', 0));
             if (s != "1" && s != "=") {
-                split[j++] = s;
+                split.at(j++) = s;
             }
             line = line.substr(line.find_first_of(' ', 0) + 1);
         }
-        g.insert_edge(split[0], split[2], 1 / stold(split[1]));
-        g.insert_edge(split[2], split[0], stold(split[1]));
+        _units_graph.insert_edge(split[0], split[2], 1 / (double) stold(split[1]));
+        _units_graph.insert_edge(split[2], split[0], (double) stold(split[1]));
     }
     file.close();
 }
 
 
-const ariel::NumberWithUnits ariel::NumberWithUnits::operator+(const ariel::NumberWithUnits &other) const {
-    if (!g.is_same_dim(this->unit, other.unit)) {
+ariel::NumberWithUnits ariel::NumberWithUnits::operator+(const ariel::NumberWithUnits &other) const {
+    if (!_units_graph.is_same_dim(this->_unit, other._unit)) {
         throw std::runtime_error(
-                "Units do not match - [" + other.unit + "] cannot be converted to [" + this->unit + "]");
+                "Units do not match - [" + other._unit + "] cannot be converted to [" + this->_unit + "]");
     }
     double d = 1;
-    if (this->unit != other.unit) {
-        d = g.get_conv(this->unit, other.unit);
+    if (this->_unit != other._unit) {
+        d = _units_graph.get_conv(this->_unit, other._unit);
     }
-    return ariel::NumberWithUnits(this->n + (other.n * d), this->unit);
+    return ariel::NumberWithUnits(this->_n + (other._n * d), this->_unit);
 }
 
 ariel::NumberWithUnits &ariel::NumberWithUnits::operator+=(const ariel::NumberWithUnits &other) {
-    if (!g.is_same_dim(this->unit, other.unit)) {
+    if (!_units_graph.is_same_dim(this->_unit, other._unit)) {
         throw std::runtime_error(
-                "Units do not match - [" + other.unit + "] cannot be converted to [" + this->unit + "]");
+                "Units do not match - [" + other._unit + "] cannot be converted to [" + this->_unit + "]");
     }
     double d = 1;
-    if (this->unit != other.unit) {
-        d = g.get_conv(this->unit, other.unit);
+    if (this->_unit != other._unit) {
+        d = _units_graph.get_conv(this->_unit, other._unit);
     }
-    this->n += (other.n * d);
+    this->_n += (other._n * d);
     return *this;
 }
 
-const ariel::NumberWithUnits ariel::NumberWithUnits::operator+() {
-    return ariel::NumberWithUnits(-this->n, this->unit);
+ariel::NumberWithUnits ariel::NumberWithUnits::operator+() {
+    return ariel::NumberWithUnits(this->_n, this->_unit);
 }
 
-const ariel::NumberWithUnits ariel::NumberWithUnits::operator-(const ariel::NumberWithUnits &other) const {
-    if (!g.is_same_dim(this->unit, other.unit)) {
+ariel::NumberWithUnits ariel::NumberWithUnits::operator-(const ariel::NumberWithUnits &other) const {
+    if (!_units_graph.is_same_dim(this->_unit, other._unit)) {
         throw std::runtime_error(
-                "Units do not match - [" + other.unit + "] cannot be converted to [" + this->unit + "]");
+                "Units do not match - [" + other._unit + "] cannot be converted to [" + this->_unit + "]");
     }
     double d = 1;
-    if (this->unit != other.unit) {
-        d = g.get_conv(this->unit, other.unit);
+    if (this->_unit != other._unit) {
+        d = _units_graph.get_conv(this->_unit, other._unit);
     }
-    return ariel::NumberWithUnits(this->n - (other.n * d), this->unit);
+    return ariel::NumberWithUnits(this->_n - (other._n * d), this->_unit);
 }
 
 ariel::NumberWithUnits &ariel::NumberWithUnits::operator-=(const ariel::NumberWithUnits &other) {
-    if (!g.is_same_dim(this->unit, other.unit)) {
+    if (!_units_graph.is_same_dim(this->_unit, other._unit)) {
         throw std::runtime_error(
-                "Units do not match - [" + other.unit + "] cannot be converted to [" + this->unit + "]");
+                "Units do not match - [" + other._unit + "] cannot be converted to [" + this->_unit + "]");
     }
     double d = 1;
-    if (this->unit != other.unit) {
-        d = g.get_conv(this->unit, other.unit);
+    if (this->_unit != other._unit) {
+        d = _units_graph.get_conv(this->_unit, other._unit);
     }
-    this->n -= (other.n * d);
+    this->_n -= (other._n * d);
     return *this;
 }
 
-const ariel::NumberWithUnits ariel::NumberWithUnits::operator-() {
-    return ariel::NumberWithUnits(-this->n, this->unit);
+ariel::NumberWithUnits ariel::NumberWithUnits::operator-() {
+    return ariel::NumberWithUnits(-this->_n, this->_unit);
 }
 
 bool ariel::NumberWithUnits::operator==(const ariel::NumberWithUnits &other) const {
-    if (!g.is_same_dim(this->unit, other.unit)) {
+    if (!_units_graph.is_same_dim(this->_unit, other._unit)) {
         return false;
     }
-    NumberWithUnits temp{0, this->unit};
+    NumberWithUnits temp{0, this->_unit};
     temp += other;
-    return abs(this->n - temp.n) < TOLERANCE;
+    return abs(this->_n - temp._n) < TOLERANCE;
 }
 
 bool ariel::NumberWithUnits::operator!=(const ariel::NumberWithUnits &other) const {
@@ -109,86 +109,86 @@ bool ariel::NumberWithUnits::operator!=(const ariel::NumberWithUnits &other) con
 }
 
 bool ariel::NumberWithUnits::operator<(const ariel::NumberWithUnits &other) const {
-    if (!g.is_same_dim(this->unit, other.unit)) {
+    if (!_units_graph.is_same_dim(this->_unit, other._unit)) {
         return false;
     }
-    NumberWithUnits temp{0, this->unit};
+    NumberWithUnits temp{0, this->_unit};
     temp += other;
-    return this->n < temp.n;
+    return this->_n < temp._n;
 }
 
 bool ariel::NumberWithUnits::operator>(const ariel::NumberWithUnits &other) const {
-    if (!g.is_same_dim(this->unit, other.unit)) {
+    if (!_units_graph.is_same_dim(this->_unit, other._unit)) {
         return false;
     }
-    NumberWithUnits temp{0, this->unit};
+    NumberWithUnits temp{0, this->_unit};
     temp += other;
-    return this->n > temp.n;
+    return this->_n > temp._n;
 }
 
 bool ariel::NumberWithUnits::operator<=(const ariel::NumberWithUnits &other) const {
-    if (!g.is_same_dim(this->unit, other.unit)) {
+    if (!_units_graph.is_same_dim(this->_unit, other._unit)) {
         return false;
     }
-    NumberWithUnits temp{0, this->unit};
+    NumberWithUnits temp{0, this->_unit};
     temp += other;
-    return this->n <= temp.n;
+    return this->_n <= temp._n;
 }
 
 bool ariel::NumberWithUnits::operator>=(const ariel::NumberWithUnits &other) const {
-    if (!g.is_same_dim(this->unit, other.unit)) {
+    if (!_units_graph.is_same_dim(this->_unit, other._unit)) {
         return false;
     }
-    NumberWithUnits temp{0, this->unit};
+    NumberWithUnits temp{0, this->_unit};
     temp += other;
-    return this->n >= temp.n;
+    return this->_n >= temp._n;
 }
 
 ariel::NumberWithUnits &ariel::NumberWithUnits::operator++() {
-    this->n++;
+    this->_n++;
     return *this;
 }
 
 ariel::NumberWithUnits &ariel::NumberWithUnits::operator--() {
-    this->n--;
+    this->_n--;
     return *this;
 }
 
-const ariel::NumberWithUnits ariel::NumberWithUnits::operator++(int dummy_flag_for_postfix_increment) {
+ariel::NumberWithUnits ariel::NumberWithUnits::operator++(int dummy_flag_for_postfix_increment) {
     NumberWithUnits copy = *this;
-    this->n++;
+    this->_n++;
     return copy;
 }
 
-const ariel::NumberWithUnits ariel::NumberWithUnits::operator--(int dummy_flag_for_postfix_increment) {
+ariel::NumberWithUnits ariel::NumberWithUnits::operator--(int dummy_flag_for_postfix_increment) {
     NumberWithUnits copy = *this;
-    this->n--;
+    this->_n--;
     return copy;
 }
 
-const ariel::NumberWithUnits ariel::operator*(const ariel::NumberWithUnits &num, double n) {
-    return ariel::NumberWithUnits(num.n * n, num.unit);
+ariel::NumberWithUnits ariel::operator*(const ariel::NumberWithUnits &num, double n) {
+    return ariel::NumberWithUnits(num._n * n, num._unit);
 }
 
-const ariel::NumberWithUnits ariel::operator*(double n, const ariel::NumberWithUnits &num) {
+ariel::NumberWithUnits ariel::operator*(double n, const ariel::NumberWithUnits &num) {
     return num * n;
 }
 
-const ariel::NumberWithUnits ariel::operator*(const ariel::NumberWithUnits &num, int n) {
+ariel::NumberWithUnits ariel::operator*(const ariel::NumberWithUnits &num, int n) {
     return num * (double) n;
 }
 
-const ariel::NumberWithUnits ariel::operator*(int n, const ariel::NumberWithUnits &num) {
+ariel::NumberWithUnits ariel::operator*(int n, const ariel::NumberWithUnits &num) {
     return num * (double) n;
 }
 
 std::ostream &ariel::operator<<(std::ostream &os, const ariel::NumberWithUnits &num) {
-    os << num.n << "[" << num.unit << "]";
+    os << num._n << "[" << num._unit << "]";
     return os;
 }
 
 std::istream &ariel::operator>>(std::istream &is, ariel::NumberWithUnits &num) {
-    char c;
-    is >> num.n >> c >> num.unit >> c;
+    char c = 0;
+    is >> num._n >> c >> num._unit >> c;
     return is;
 }
