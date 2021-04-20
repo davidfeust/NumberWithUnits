@@ -39,13 +39,17 @@ int main() {
     cout << a << endl;   // Prints "700[kg]"
     cout << (a += NumberWithUnits{1, "ton"}) << endl;  // prints "1700[kg]"
     cout << a << endl;   // Prints "1700[kg]". Note that a has changed.
-
-    try {
-        cout << (a + b) << endl;
-    } catch (const std::exception &ex) {
-        cout << ex.what() << endl; // Prints "Units do not match - [m] cannot be converted to [kg]"
-    }
-    NumberWithUnits c{1, "_units_graph"};
+//    for (int i = 0; i < 5; ++i) {
+//        cout << "Enter number with unit";
+//        NumberWithUnits c{0, "km"};
+//        cin >> c;
+//        cout << c << endl;
+//    }
+//    try {
+//        cout << (a + b) << endl;
+//    } catch (const std::exception &ex) {
+//        cout << ex.what() << endl; // Prints "Units do not match - [m] cannot be converted to [kg]"
+//    }
     cout << "End of demo!" << endl;
     return 0;
 }

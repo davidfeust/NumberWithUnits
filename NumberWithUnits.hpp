@@ -24,6 +24,7 @@ namespace ariel {
     public:
 
         NumberWithUnits(double num, std::string unit);
+        NumberWithUnits();
 
         static void read_units(std::ifstream &file);
 
@@ -57,9 +58,9 @@ namespace ariel {
         NumberWithUnits &operator--();
 
         // postfix:
-        NumberWithUnits operator++(int dummy_flag_for_postfix_increment);
+        NumberWithUnits operator++(int);
 
-        NumberWithUnits operator--(int dummy_flag_for_postfix_increment);
+        NumberWithUnits operator--(int);
 
         friend NumberWithUnits operator*(const NumberWithUnits &num, double n);
 

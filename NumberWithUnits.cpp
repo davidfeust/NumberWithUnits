@@ -14,9 +14,11 @@ UnitGraph NumberWithUnits::_units_graph;
 
 ariel::NumberWithUnits::NumberWithUnits(double num, std::string unit) : _n(num), _unit(std::move(unit)) {
     if (!_units_graph.isThereAUnit(this->_unit)) {
-        throw std::runtime_error("Unknown _unit");
+        throw std::runtime_error("Unknown unit");
     }
 }
+
+NumberWithUnits::NumberWithUnits() : _n(0) {}
 
 void NumberWithUnits::read_units(std::ifstream &file) {
     string line;
@@ -118,30 +120,15 @@ bool ariel::NumberWithUnits::operator<(const ariel::NumberWithUnits &other) cons
 }
 
 bool ariel::NumberWithUnits::operator>(const ariel::NumberWithUnits &other) const {
-    if (!_units_graph.is_same_dim(this->_unit, other._unit)) {
-        return false;
-    }
-    NumberWithUnits temp{0, this->_unit};
-    temp += other;
-    return this->_n > temp._n;
+    return !(*this < other) && (*this != other);
 }
 
 bool ariel::NumberWithUnits::operator<=(const ariel::NumberWithUnits &other) const {
-    if (!_units_graph.is_same_dim(this->_unit, other._unit)) {
-        return false;
-    }
-    NumberWithUnits temp{0, this->_unit};
-    temp += other;
-    return this->_n <= temp._n;
+    return (*this < other) || (*this == other);
 }
 
 bool ariel::NumberWithUnits::operator>=(const ariel::NumberWithUnits &other) const {
-    if (!_units_graph.is_same_dim(this->_unit, other._unit)) {
-        return false;
-    }
-    NumberWithUnits temp{0, this->_unit};
-    temp += other;
-    return this->_n >= temp._n;
+    return (*this > other) || (*this == other);
 }
 
 ariel::NumberWithUnits &ariel::NumberWithUnits::operator++() {
@@ -154,13 +141,13 @@ ariel::NumberWithUnits &ariel::NumberWithUnits::operator--() {
     return *this;
 }
 
-ariel::NumberWithUnits ariel::NumberWithUnits::operator++(int dummy_flag_for_postfix_increment) {
+ariel::NumberWithUnits ariel::NumberWithUnits::operator++(int) {
     NumberWithUnits copy = *this;
     this->_n++;
     return copy;
 }
 
-ariel::NumberWithUnits ariel::NumberWithUnits::operator--(int dummy_flag_for_postfix_increment) {
+ariel::NumberWithUnits ariel::NumberWithUnits::operator--(int) {
     NumberWithUnits copy = *this;
     this->_n--;
     return copy;
@@ -187,8 +174,32 @@ std::ostream &ariel::operator<<(std::ostream &os, const ariel::NumberWithUnits &
     return os;
 }
 
+static istream &getAndCheckNextCharIs(istream &input, char expectedChar) {
+    char actualChar = 0;
+    input >> actualChar;
+    if (!input) {
+        return input;
+    }
+
+    if (actualChar != expectedChar) {
+        // fail bit is for format error
+        input.setstate(ios::failbit);
+    }
+    return input;
+}
+
 std::istream &ariel::operator>>(std::istream &is, ariel::NumberWithUnits &num) {
+    double number = 0;
+    string unit_str;
     char c = 0;
-    is >> num._n >> c >> num._unit >> c;
+    is >> number;
+    is >> skipws >> c;
+    if (c != '[') {
+        is.setstate(ios::failbit);
+    }
+    is >> unit_str;
+    unit_str = unit_str.substr(unit_str.find_first_not_of(' '), unit_str.find_first_of(']'));
+    num._n = number;
+    num._unit = unit_str;
     return is;
 }

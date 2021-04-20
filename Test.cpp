@@ -14,13 +14,14 @@ double random(double min, double max);
 set<string> all_units;
 
 // Mathematical operators:
-TEST_CASE ("Init") {
-    ifstream units_file{"units.txt"};
+void init(string file) {
+    all_units.clear();
+    ifstream units_file{file};
     if (!units_file.is_open()) {
         cout << "Failed to open file!" << endl;
     }
     NumberWithUnits::read_units(units_file);
-    ifstream units_file_temp{"units.txt"};
+    ifstream units_file_temp{file};
     string line;
     while (getline(units_file_temp, line)) {
         array<string, 3> split;
@@ -37,7 +38,8 @@ TEST_CASE ("Init") {
     }
 }
 
-TEST_CASE ("Mathematical operators for same _unit") {
+TEST_CASE ("Mathematical operators for same unit") {
+    init("units.txt");
     for (const string &i: all_units) {
         double x = random(-30, 30);
         double y = random(-30, 30);
@@ -73,7 +75,100 @@ TEST_CASE ("Mathematical operators for same _unit") {
     }
 }
 
+TEST_CASE ("Mathematical operators for different unit") {
+    init("units_file.txt");
+    // conversations units 
+    double d2y = 365;
+    double h2d = 24;
+    double m2h = 60;
+    double s2m = 60;
+    for (int i = 0; i < 20; i++) {
+        int max = 30;
+        int min = -max;
+        double ny = random(min, max);
+        double nd = random(min, max);
+        double nh = random(min, max);
+        double nm = random(min, max);
+        double ns = random(min, max);
+        NumberWithUnits y{ny, "year"};
+        NumberWithUnits d{nd, "day"};
+        NumberWithUnits h{nh, "hour"};
+        NumberWithUnits m{nm, "min"};
+        NumberWithUnits s{ns, "sec"};
+                SUBCASE("+") {
+                    CHECK_EQ(y + d, NumberWithUnits{ny + (1. / d2y) * nd, "year"});
+                    CHECK_EQ(d + y, NumberWithUnits{nd + d2y * ny, "day"});
+                    CHECK_EQ(d + h, NumberWithUnits{nd + (1. / h2d) * nh, "day"});
+                    CHECK_EQ(h + d, NumberWithUnits{nh + h2d * nd, "hour"});
+                    CHECK_EQ(m + s, NumberWithUnits{nm + (1. / s2m) * ns, "min"});
+                    CHECK_EQ(s + m, NumberWithUnits{ns + s2m * nm, "sec"});
+                    CHECK_EQ(h + m, NumberWithUnits{nh + (1. / m2h) * nm, "hour"});
+            double calc = ny + (1. / d2y) * (nd + (1. / h2d) * (nh + (1. / m2h) * (nm + (1. / s2m) * ns)));
+                    CHECK_EQ(y + d + h + m + s, NumberWithUnits{calc, "year"});
+        }
+                SUBCASE("-") {
+                    CHECK_EQ(y - d, NumberWithUnits{ny - (1. / d2y) * nd, "year"});
+                    CHECK_EQ(d - y, NumberWithUnits{nd - d2y * ny, "day"});
+                    CHECK_EQ(d - h, NumberWithUnits{nd - (1. / h2d) * nh, "day"});
+                    CHECK_EQ(h - d, NumberWithUnits{nh - h2d * nd, "hour"});
+                    CHECK_EQ(m - s, NumberWithUnits{nm - (1. / s2m) * ns, "min"});
+                    CHECK_EQ(s - m, NumberWithUnits{ns - s2m * nm, "sec"});
+                    CHECK_EQ(h - m, NumberWithUnits{nh - (1. / m2h) * nm, "hour"});
+        }
+
+                SUBCASE("<") {
+                    CHECK_EQ(y < d, ny < (1. / d2y) * nd);
+                    CHECK_EQ(d < h, nd < (1. / h2d) * nh);
+                    CHECK_EQ(h < d, nh < h2d * nd);
+                    CHECK_EQ(m < s, nm < (1. / s2m) * ns);
+                    CHECK_EQ(s < m, ns < s2m * nm);
+                    CHECK_EQ(h < m, nh < (1. / m2h) * nm);
+        }
+                SUBCASE(">") {
+                    CHECK_EQ(y > d, ny > (1. / d2y) * nd);
+                    CHECK_EQ(d > h, nd > (1. / h2d) * nh);
+                    CHECK_EQ(h > d, nh > h2d * nd);
+                    CHECK_EQ(m > s, nm > (1. / s2m) * ns);
+                    CHECK_EQ(s > m, ns > s2m * nm);
+                    CHECK_EQ(h > m, nh > (1. / m2h) * nm);
+        }
+                SUBCASE("<=") {
+                    CHECK_EQ(y <= d, ny <= (1. / d2y) * nd);
+                    CHECK_EQ(d <= h, nd <= (1. / h2d) * nh);
+                    CHECK_EQ(h <= d, nh <= h2d * nd);
+                    CHECK_EQ(m <= s, nm <= (1. / s2m) * ns);
+                    CHECK_EQ(s <= m, ns <= s2m * nm);
+                    CHECK_EQ(h <= m, nh <= (1. / m2h) * nm);
+        }
+                SUBCASE(">=") {
+                    CHECK_EQ(y >= d, ny >= (1. / d2y) * nd);
+                    CHECK_EQ(d >= h, nd >= (1. / h2d) * nh);
+                    CHECK_EQ(h >= d, nh >= h2d * nd);
+                    CHECK_EQ(m >= s, nm >= (1. / s2m) * ns);
+                    CHECK_EQ(s >= m, ns >= s2m * nm);
+                    CHECK_EQ(h >= m, nh >= (1. / m2h) * nm);
+        }
+                SUBCASE("==") {
+                    CHECK_EQ(y == d, ny == (1. / d2y) * nd);
+                    CHECK_EQ(d == h, nd == (1. / h2d) * nh);
+                    CHECK_EQ(h == d, nh == h2d * nd);
+                    CHECK_EQ(m == s, nm == (1. / s2m) * ns);
+                    CHECK_EQ(s == m, ns == s2m * nm);
+                    CHECK_EQ(h == m, nh == (1. / m2h) * nm);
+        }
+                SUBCASE("!=") {
+                    CHECK_EQ(y != d, ny != (1. / d2y) * nd);
+                    CHECK_EQ(d != h, nd != (1. / h2d) * nh);
+                    CHECK_EQ(h != d, nh != h2d * nd);
+                    CHECK_EQ(m != s, nm != (1. / s2m) * ns);
+                    CHECK_EQ(s != m, ns != s2m * nm);
+                    CHECK_EQ(h != m, nh != (1. / m2h) * nm);
+        }
+    }
+}
+
 TEST_CASE ("Multiplication") {
+    init("units.txt");
     for (const string &i: all_units) {
         double x = random(-30, 30);
         double y = random(-30, 30);
@@ -83,8 +178,8 @@ TEST_CASE ("Multiplication") {
     }
 }
 
-
-TEST_CASE ("Relation operators for same _unit") {
+TEST_CASE ("Relation operators for same unit") {
+    init("units.txt");
     for (const string &i: all_units) {
         double x = random(-30, 30);
         double y = random(-30, 30);
@@ -92,29 +187,47 @@ TEST_CASE ("Relation operators for same _unit") {
         NumberWithUnits b{y, i};
         try {
                     CHECK((x < y) == (a < b));
+                    CHECK((x > y) == (a > b));
+                    CHECK((x == y) == (a == b));
+                    CHECK((x != y) == (a != b));
+                    CHECK((x <= y) == (a <= b));
+                    CHECK((x >= y) == (a >= b));
         } catch (const std::exception &ex) {}
     }
 }
 
 TEST_CASE ("Output") {
+    init("units.txt");
     for (const string &i: all_units) {
         double x = random(-30, 30);
         ostringstream output;
         NumberWithUnits num{x, i};
         std::stringstream stream;
-        output << num;
+        output << fixed << setprecision(4) << num;
         stream << fixed << setprecision(4) << x;
-        CHECK(output.str() == stream.str() + "[" + i + "]");
+                CHECK(output.str() == stream.str() + "[" + i + "]");
     }
 }
 
 TEST_CASE ("Input") {
-    NumberWithUnits num{0, "_units_graph"};
+    init("units.txt");
+    NumberWithUnits num1, num2, num3, num4;
     for (const string &i: all_units) {
         double x = random(-30, 30);
-        istringstream input{to_string(x) + " [ " + i + " ]"};
-        input >> num;
-                CHECK(num == NumberWithUnits{x, i});
+        istringstream input1{to_string(x) + " [ " + i + " ]"};
+        input1 >> num1;
+
+                CHECK(num1 == NumberWithUnits{x, i});
+        istringstream input2{to_string(x) + "[" + i + "]"};
+        input2 >> num2;
+                CHECK(num2 == NumberWithUnits{x, i});
+        istringstream input3{to_string(x) + " [" + i + "]"};
+        input3 >> num3;
+                CHECK(num3 == NumberWithUnits{x, i});
+        istringstream input4{to_string(x) + "[" + i + " ]"};
+        input4 >> num4;
+                CHECK(num4 == NumberWithUnits{x, i});
+
     }
 }
 

@@ -1,5 +1,6 @@
 //
 // Created by david on 06/04/2021.
+// Thanks to Achiya Zigler for the idea of using this data structure!
 //
 #pragma once
 
@@ -70,7 +71,7 @@ namespace ariel {
             return false;
         }
 
-        bool isThereAUnit(const std::string& unit) {
+        bool isThereAUnit(const std::string &unit) {
             return _nodes.count(unit);
         }
     };
