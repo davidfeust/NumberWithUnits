@@ -7,12 +7,12 @@
 #include <iostream>
 #include "NumberWithUnits.hpp"
 
-using namespace ariel;
 using namespace std;
+using namespace ariel;
 
 UnitGraph NumberWithUnits::_units_graph;
 
-ariel::NumberWithUnits::NumberWithUnits(double num, std::string unit) : _n(num), _unit(std::move(unit)) {
+NumberWithUnits::NumberWithUnits(double num, std::string unit) : _n(num), _unit(std::move(unit)) {
     if (!_units_graph.isThereAUnit(this->_unit)) {
         throw std::runtime_error("Unknown unit");
     }
@@ -20,6 +20,10 @@ ariel::NumberWithUnits::NumberWithUnits(double num, std::string unit) : _n(num),
 
 NumberWithUnits::NumberWithUnits() : _n(0) {}
 
+/**
+ * read units for file
+ * @param file
+ */
 void NumberWithUnits::read_units(std::ifstream &file) {
     string line;
     while (getline(file, line)) {
@@ -38,8 +42,11 @@ void NumberWithUnits::read_units(std::ifstream &file) {
     file.close();
 }
 
+///////////////////////////
+// Mathematical operators:
+///////////////////////////
 
-ariel::NumberWithUnits ariel::NumberWithUnits::operator+(const ariel::NumberWithUnits &other) const {
+NumberWithUnits NumberWithUnits::operator+(const NumberWithUnits &other) const {
     if (!_units_graph.is_same_dim(this->_unit, other._unit)) {
         throw std::runtime_error(
                 "Units do not match - [" + other._unit + "] cannot be converted to [" + this->_unit + "]");
@@ -51,7 +58,7 @@ ariel::NumberWithUnits ariel::NumberWithUnits::operator+(const ariel::NumberWith
     return ariel::NumberWithUnits(this->_n + (other._n * d), this->_unit);
 }
 
-ariel::NumberWithUnits &ariel::NumberWithUnits::operator+=(const ariel::NumberWithUnits &other) {
+NumberWithUnits &ariel::NumberWithUnits::operator+=(const NumberWithUnits &other) {
     if (!_units_graph.is_same_dim(this->_unit, other._unit)) {
         throw std::runtime_error(
                 "Units do not match - [" + other._unit + "] cannot be converted to [" + this->_unit + "]");
@@ -64,11 +71,11 @@ ariel::NumberWithUnits &ariel::NumberWithUnits::operator+=(const ariel::NumberWi
     return *this;
 }
 
-ariel::NumberWithUnits ariel::NumberWithUnits::operator+() {
+NumberWithUnits ariel::NumberWithUnits::operator+() {
     return ariel::NumberWithUnits(this->_n, this->_unit);
 }
 
-ariel::NumberWithUnits ariel::NumberWithUnits::operator-(const ariel::NumberWithUnits &other) const {
+NumberWithUnits ariel::NumberWithUnits::operator-(const NumberWithUnits &other) const {
     if (!_units_graph.is_same_dim(this->_unit, other._unit)) {
         throw std::runtime_error(
                 "Units do not match - [" + other._unit + "] cannot be converted to [" + this->_unit + "]");
@@ -80,7 +87,7 @@ ariel::NumberWithUnits ariel::NumberWithUnits::operator-(const ariel::NumberWith
     return ariel::NumberWithUnits(this->_n - (other._n * d), this->_unit);
 }
 
-ariel::NumberWithUnits &ariel::NumberWithUnits::operator-=(const ariel::NumberWithUnits &other) {
+NumberWithUnits &ariel::NumberWithUnits::operator-=(const NumberWithUnits &other) {
     if (!_units_graph.is_same_dim(this->_unit, other._unit)) {
         throw std::runtime_error(
                 "Units do not match - [" + other._unit + "] cannot be converted to [" + this->_unit + "]");
@@ -93,11 +100,53 @@ ariel::NumberWithUnits &ariel::NumberWithUnits::operator-=(const ariel::NumberWi
     return *this;
 }
 
-ariel::NumberWithUnits ariel::NumberWithUnits::operator-() {
+NumberWithUnits ariel::NumberWithUnits::operator-() {
     return ariel::NumberWithUnits(-this->_n, this->_unit);
 }
 
-bool ariel::NumberWithUnits::operator==(const ariel::NumberWithUnits &other) const {
+NumberWithUnits &ariel::NumberWithUnits::operator++() {
+    this->_n++;
+    return *this;
+}
+
+NumberWithUnits &ariel::NumberWithUnits::operator--() {
+    this->_n--;
+    return *this;
+}
+
+const NumberWithUnits ariel::NumberWithUnits::operator++(int) {
+    NumberWithUnits copy = *this;
+    this->_n++;
+    return copy;
+}
+
+const NumberWithUnits ariel::NumberWithUnits::operator--(int) {
+    NumberWithUnits copy = *this;
+    this->_n--;
+    return copy;
+}
+
+NumberWithUnits ariel::operator*(const NumberWithUnits &num, double n) {
+    return ariel::NumberWithUnits(num._n * n, num._unit);
+}
+
+NumberWithUnits ariel::operator*(double n, const NumberWithUnits &num) {
+    return num * n;
+}
+
+NumberWithUnits ariel::operator*(const ariel::NumberWithUnits &num, int n) {
+    return num * (double) n;
+}
+
+NumberWithUnits ariel::operator*(int n, const ariel::NumberWithUnits &num) {
+    return num * (double) n;
+}
+
+///////////////////////
+// Relation operators:
+///////////////////////
+
+bool NumberWithUnits::operator==(const NumberWithUnits &other) const {
     if (!_units_graph.is_same_dim(this->_unit, other._unit)) {
         return false;
     }
@@ -106,11 +155,11 @@ bool ariel::NumberWithUnits::operator==(const ariel::NumberWithUnits &other) con
     return abs(this->_n - temp._n) < TOLERANCE;
 }
 
-bool ariel::NumberWithUnits::operator!=(const ariel::NumberWithUnits &other) const {
+bool NumberWithUnits::operator!=(const NumberWithUnits &other) const {
     return !(*this == other);
 }
 
-bool ariel::NumberWithUnits::operator<(const ariel::NumberWithUnits &other) const {
+bool NumberWithUnits::operator<(const NumberWithUnits &other) const {
     if (!_units_graph.is_same_dim(this->_unit, other._unit)) {
         return false;
     }
@@ -119,73 +168,25 @@ bool ariel::NumberWithUnits::operator<(const ariel::NumberWithUnits &other) cons
     return this->_n < temp._n;
 }
 
-bool ariel::NumberWithUnits::operator>(const ariel::NumberWithUnits &other) const {
+bool NumberWithUnits::operator>(const NumberWithUnits &other) const {
     return !(*this < other) && (*this != other);
 }
 
-bool ariel::NumberWithUnits::operator<=(const ariel::NumberWithUnits &other) const {
+bool NumberWithUnits::operator<=(const ariel::NumberWithUnits &other) const {
     return (*this < other) || (*this == other);
 }
 
-bool ariel::NumberWithUnits::operator>=(const ariel::NumberWithUnits &other) const {
+bool NumberWithUnits::operator>=(const NumberWithUnits &other) const {
     return (*this > other) || (*this == other);
 }
 
-ariel::NumberWithUnits &ariel::NumberWithUnits::operator++() {
-    this->_n++;
-    return *this;
-}
-
-ariel::NumberWithUnits &ariel::NumberWithUnits::operator--() {
-    this->_n--;
-    return *this;
-}
-
-ariel::NumberWithUnits ariel::NumberWithUnits::operator++(int) {
-    NumberWithUnits copy = *this;
-    this->_n++;
-    return copy;
-}
-
-ariel::NumberWithUnits ariel::NumberWithUnits::operator--(int) {
-    NumberWithUnits copy = *this;
-    this->_n--;
-    return copy;
-}
-
-ariel::NumberWithUnits ariel::operator*(const ariel::NumberWithUnits &num, double n) {
-    return ariel::NumberWithUnits(num._n * n, num._unit);
-}
-
-ariel::NumberWithUnits ariel::operator*(double n, const ariel::NumberWithUnits &num) {
-    return num * n;
-}
-
-ariel::NumberWithUnits ariel::operator*(const ariel::NumberWithUnits &num, int n) {
-    return num * (double) n;
-}
-
-ariel::NumberWithUnits ariel::operator*(int n, const ariel::NumberWithUnits &num) {
-    return num * (double) n;
-}
+/////////////////
+// IO operators:
+/////////////////
 
 std::ostream &ariel::operator<<(std::ostream &os, const ariel::NumberWithUnits &num) {
     os << num._n << "[" << num._unit << "]";
     return os;
-}
-
-static istream &getAndCheckNextCharIs(istream &input, char expectedChar) {
-    char actualChar = 0;
-    input >> actualChar;
-    if (!input) {
-        return input;
-    }
-
-    if (actualChar != expectedChar) {
-        // fail bit is for format error
-        input.setstate(ios::failbit);
-    }
-    return input;
 }
 
 std::istream &ariel::operator>>(std::istream &is, ariel::NumberWithUnits &num) {
@@ -201,5 +202,8 @@ std::istream &ariel::operator>>(std::istream &is, ariel::NumberWithUnits &num) {
     unit_str = unit_str.substr(unit_str.find_first_not_of(' '), unit_str.find_first_of(']'));
     num._n = number;
     num._unit = unit_str;
+    if (!NumberWithUnits::_units_graph.isThereAUnit(num._unit)) {
+        throw std::runtime_error("Unknown unit");
+    }
     return is;
 }

@@ -58,9 +58,9 @@ namespace ariel {
         NumberWithUnits &operator--();
 
         // postfix:
-        NumberWithUnits operator++(int);
+        const NumberWithUnits operator++(int);
 
-        NumberWithUnits operator--(int);
+        const NumberWithUnits operator--(int);
 
         friend NumberWithUnits operator*(const NumberWithUnits &num, double n);
 
