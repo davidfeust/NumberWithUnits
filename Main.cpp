@@ -19,6 +19,12 @@ int main() {
     cout << "The numbers:" << endl;
     cout << x << endl;
     cout << y << endl;
+    try {
+        x+y;
+    } catch (const std::exception &ex) {
+        cout << ex.what() << endl; // Prints "Units do not match - [m] cannot be converted to [kg]"
+        exit(-1);
+    }
     cout << boolalpha; // print booleans as strings from now on:
     while (input != 0) {
         cout << "Choose math or relation operation: +, -, *, <, >, = (==), ! (!=), 0 (to exit)" << endl;
