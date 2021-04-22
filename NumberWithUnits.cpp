@@ -116,13 +116,13 @@ NumberWithUnits &ariel::NumberWithUnits::operator--() {
     return *this;
 }
 
-const NumberWithUnits ariel::NumberWithUnits::operator++(int) {
+NumberWithUnits ariel::NumberWithUnits::operator++(int) {
     NumberWithUnits copy = *this;
     this->_n++;
     return copy;
 }
 
-const NumberWithUnits ariel::NumberWithUnits::operator--(int) {
+NumberWithUnits ariel::NumberWithUnits::operator--(int) {
     NumberWithUnits copy = *this;
     this->_n--;
     return copy;
@@ -203,11 +203,21 @@ std::istream &ariel::operator>>(std::istream &is, ariel::NumberWithUnits &num) {
         is.setstate(ios::failbit);
     }
     is >> unit_str;
+    bool flag = false;
+    if (unit_str[unit_str.size() - 1] == ']') {
+        flag = true;
+    }
     unit_str = unit_str.substr(unit_str.find_first_not_of(' '), unit_str.find_first_of(']'));
     num._n = number;
     num._unit = unit_str;
     if (!NumberWithUnits::_units_graph.isThereAUnit(num._unit)) {
         throw std::runtime_error("Unknown unit");
+    }
+    if (!flag) {
+        is >> skipws >> c;
+        if (c != ']') {
+            is.setstate(ios::failbit);
+        }
     }
     return is;
 }

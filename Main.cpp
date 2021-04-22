@@ -8,8 +8,7 @@ using namespace std;
 using namespace ariel;
 
 int main() {
-//    ifstream units_file{"units_file.txt"};
-    ifstream units_file{"myTestFile2.txt"};
+    ifstream units_file{"units_file.txt"};
     NumberWithUnits::read_units(units_file);
 
     char input = -1;
