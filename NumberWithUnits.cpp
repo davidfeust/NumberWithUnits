@@ -36,8 +36,10 @@ void NumberWithUnits::read_units(std::ifstream &file) {
             }
             line = line.substr(line.find_first_of(' ', 0) + 1);
         }
-        _units_graph.insert_edge(split[0], split[2], 1 / (double) stold(split[1]));
-        _units_graph.insert_edge(split[2], split[0], (double) stold(split[1]));
+        double conv1 = 1. / (double) stold(split[1]);
+        double conv2 = (double) stold(split[1]);
+        _units_graph.insert_edge(split[0], split[2], conv1);
+        _units_graph.insert_edge(split[2], split[0], conv2);
     }
     file.close();
 }
@@ -148,7 +150,8 @@ NumberWithUnits ariel::operator*(int n, const ariel::NumberWithUnits &num) {
 
 bool NumberWithUnits::operator==(const NumberWithUnits &other) const {
     if (!_units_graph.is_same_dim(this->_unit, other._unit)) {
-        return false;
+        throw std::runtime_error(
+                "Units do not match - [" + other._unit + "] cannot be converted to [" + this->_unit + "]");
     }
     NumberWithUnits temp{0, this->_unit};
     temp += other;
@@ -161,7 +164,8 @@ bool NumberWithUnits::operator!=(const NumberWithUnits &other) const {
 
 bool NumberWithUnits::operator<(const NumberWithUnits &other) const {
     if (!_units_graph.is_same_dim(this->_unit, other._unit)) {
-        return false;
+        throw std::runtime_error(
+                "Units do not match - [" + other._unit + "] cannot be converted to [" + this->_unit + "]");
     }
     NumberWithUnits temp{0, this->_unit};
     temp += other;

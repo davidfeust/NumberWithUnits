@@ -13,17 +13,19 @@
 
 namespace ariel {
 
+    const float TOLERANCE = 0.001;
+
     class NumberWithUnits {
     private:
         std::string _unit;
         double _n;
         static UnitGraph _units_graph;
 
-        const float TOLERANCE = 0.001;
 
     public:
 
         NumberWithUnits(double num, std::string unit);
+
         NumberWithUnits();
 
         static void read_units(std::ifstream &file);
