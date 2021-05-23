@@ -29,9 +29,10 @@ void NumberWithUnits::read_units(std::ifstream &file) {
     while (getline(file, line)) {
         array<string, 3> split;
         size_t j = 0;
+        line = line.substr(line.find_first_of('1', 0) + 2);
         while (j < 3) {
             string s = line.substr(0, line.find_first_of(' ', 0));
-            if (s != "1" && s != "=") {
+            if (s != "=") {
                 split.at(j++) = s;
             }
             line = line.substr(line.find_first_of(' ', 0) + 1);
